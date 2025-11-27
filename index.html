@@ -1,47 +1,648 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NeuroViolin Mastery</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-      body {
-        font-family: 'Inter', sans-serif;
-      }
-      h1, h2, h3, h4, h5, h6 {
-        font-family: 'Merriweather', serif;
-      }
-      /* Custom Scrollbar for better aesthetics */
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f1f5f9; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #94a3b8; 
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #64748b; 
-      }
+      body { font-family: 'Inter', sans-serif; }
+      h1, h2, h3, h4, h5, h6 { font-family: 'Merriweather', serif; }
+      ::-webkit-scrollbar { width: 8px; height: 8px; }
+      ::-webkit-scrollbar-track { background: #f1f5f9; }
+      ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+      .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; }
     </style>
-  <script type="importmap">
+    <!-- Babel for in-browser JSX compilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="importmap">
 {
   "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
-    "recharts": "https://aistudiocdn.com/recharts@^3.5.0"
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "recharts": "https://aistudiocdn.com/recharts@^3.5.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0"
   }
 }
 </script>
 </head>
-  <body class="bg-slate-50 text-slate-900">
+<body class="bg-slate-50 text-slate-900">
     <div id="root"></div>
-  </body>
+
+    <script type="text/babel" data-type="module">
+        import React, { useState, useEffect, useRef } from 'https://esm.sh/react@18.2.0';
+        import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
+        import { 
+            Menu, X, CheckCircle, Circle, ArrowRight, BookOpen, ChevronRight, 
+            Clock, Activity, Shield, AlertTriangle 
+        } from 'https://esm.sh/lucide-react@0.263.1';
+        import {
+            LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+            ReferenceArea, BarChart, Bar, Cell, LabelList
+        } from 'https://esm.sh/recharts@2.7.2';
+
+        // --- Visualizations ---
+        
+        const struggleData = [
+            { difficulty: 0, learning: 0, label: "Boredom" },
+            { difficulty: 20, learning: 20 },
+            { difficulty: 50, learning: 50 },
+            { difficulty: 80, learning: 95, label: "The Struggle Zone" },
+            { difficulty: 85, learning: 100 },
+            { difficulty: 90, learning: 80 },
+            { difficulty: 100, learning: 10, label: "Anxiety/Panic" },
+        ];
+
+        const StruggleZoneChart = () => {
+            return (
+                <div className="w-full h-80 bg-white p-4 rounded-xl shadow-sm border border-slate-200 my-6">
+                <h3 className="text-lg font-bold text-slate-800 mb-2 text-center">The Struggle Zone (Optimal Learning)</h3>
+                <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={struggleData} margin={{ top: 20, right: 30, left: 0, bottom: 10 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                    <XAxis 
+                        dataKey="difficulty" 
+                        label={{ value: 'Difficulty / Error Rate', position: 'insideBottom', offset: -5 }} 
+                        tickFormatter={(val) => `${val}%`}
+                        stroke="#64748b"
+                    />
+                    <YAxis 
+                        label={{ value: 'Myelination Rate', angle: -90, position: 'insideLeft' }} 
+                        hide
+                    />
+                    <Tooltip 
+                        formatter={(value) => [`${value}%`, 'Learning Efficiency']}
+                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    />
+                    <ReferenceArea x1={75} x2={90} stroke="none" fill="#818cf8" fillOpacity={0.2} />
+                    <Line 
+                        type="monotone" 
+                        dataKey="learning" 
+                        stroke="#4f46e5" 
+                        strokeWidth={3} 
+                        dot={{ r: 4, strokeWidth: 2 }} 
+                        activeDot={{ r: 8 }} 
+                    />
+                    </LineChart>
+                </ResponsiveContainer>
+                <p className="text-xs text-center text-slate-500 mt-2">Target ~85% success rate for maximum dopamine/epinephrine balance.</p>
+                </div>
+            );
+        };
+
+        const speedData = [
+            { type: 'Unmyelinated', speed: 2, color: '#94a3b8' },
+            { type: 'Myelinated', speed: 200, color: '#4f46e5' },
+        ];
+
+        const SpeedComparisonChart = () => {
+            return (
+                <div className="w-full h-64 bg-white p-4 rounded-xl shadow-sm border border-slate-200 my-6">
+                <h3 className="text-lg font-bold text-slate-800 mb-2 text-center">Neural Transmission Speed (Meters/Second)</h3>
+                <ResponsiveContainer width="100%" height="100%">
+                    <BarChart layout="vertical" data={speedData} margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e2e8f0" />
+                    <XAxis type="number" stroke="#64748b" />
+                    <YAxis dataKey="type" type="category" width={100} stroke="#64748b" tick={{fontSize: 12, fontWeight: 600}} />
+                    <Tooltip cursor={{fill: 'transparent'}} />
+                    <Bar dataKey="speed" radius={[0, 4, 4, 0]} barSize={40}>
+                        {speedData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                        <LabelList dataKey="speed" position="right" formatter={(val) => `${val} m/s`} />
+                    </Bar>
+                    </BarChart>
+                </ResponsiveContainer>
+                <p className="text-xs text-center text-slate-500 mt-2">Myelin increases signal speed by up to 100x.</p>
+                </div>
+            );
+        };
+
+        // --- Content Constants ---
+
+        const SECTIONS = [
+          {
+            id: 'intro',
+            title: 'Introduction',
+            subtitle: 'The Physical Reality of Musical Excellence',
+            readTime: 3,
+            content: (
+              <div className="prose prose-slate max-w-none">
+                <p>
+                  For centuries, violin pedagogy has operated on intuition, tradition, and the accumulated wisdom of master teachers. We've spoken of "talent," "musicality," and "natural ability" as if they were mystical qualities bestowed by providence. But modern neuroscience has revealed something far more profound and actionable: musical mastery is not a gift from the muses—it is the systematic construction of specialized brain architecture.
+                </p>
+                <p>
+                  At the heart of this architecture lies myelin, a fatty insulation that wraps around neural pathways like rubber coating on copper wire. This biological substance, produced by cells called oligodendrocytes, is the physical manifestation of skill. When you watch Hilary Hahn execute a flawless rapid passage or hear Itzhak Perlman's singing tone, you are witnessing the result of millions of precisely myelinated neural circuits firing in exquisite coordination.
+                </p>
+                <p>
+                  This article presents a comprehensive exploration of how myelination works, why it matters for violin teaching, and how to structure practice to optimize this fundamental neurobiological process. Understanding these principles doesn't diminish the beauty of music—it empowers us to create that beauty more reliably, more quickly, and with less frustration for our students.
+                </p>
+              </div>
+            )
+          },
+          {
+            id: 'part-1',
+            title: 'Part I: Biological Foundation',
+            subtitle: 'Myelin: The Broadband of the Brain',
+            readTime: 5,
+            content: (
+              <div className="prose prose-slate max-w-none">
+                <h3>Understanding Myelin: The Broadband of the Brain</h3>
+                <p>
+                  Myelin is a lipid-rich substance that wraps around the axons of neurons in a spiral pattern, creating what looks like beads on a string when viewed under a microscope. Each "bead" is actually a segment of myelin sheath created by a single oligodendrocyte, with tiny gaps between segments called nodes of Ranvier.
+                </p>
+                
+                <div className="my-8 flex justify-center">
+                    <a href="https://ibb.co/JRsQ03D6" target="_blank" rel="noopener noreferrer">
+                        <img src="https://i.ibb.co/7J148ksM/myelin.jpg" alt="myelin structure diagram" className="rounded-xl shadow-md max-w-full md:max-w-lg" />
+                    </a>
+                </div>
+
+                <p>
+                  The function of myelin is elegantly simple yet profoundly important: it increases the speed of electrical signal transmission along the axon by up to 100 times. This isn't a minor improvement—it's the difference between beginner and virtuoso.
+                </p>
+                
+                <SpeedComparisonChart />
+
+                <p>But speed is only part of the story. Myelin also provides:</p>
+                <ul className="not-prose grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+                    <li className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <strong className="block text-indigo-700 mb-1">Signal Precision</strong>
+                        <span className="text-slate-600 text-sm">By insulating the axon, myelin prevents electrical signals from "leaking" to adjacent neurons, ensuring that the intended movement—and only that movement—is executed.</span>
+                    </li>
+                    <li className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <strong className="block text-indigo-700 mb-1">Timing Accuracy</strong>
+                        <span className="text-slate-600 text-sm">The nodes of Ranvier create precise points where the signal regenerates, allowing for extraordinarily exact timing between neural signals. This is critical for coordinating the dozens of muscles involved in complex violin movements.</span>
+                    </li>
+                    <li className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <strong className="block text-indigo-700 mb-1">Energy Efficiency</strong>
+                        <span className="text-slate-600 text-sm">Myelinated neurons require far less cellular energy to transmit signals, allowing the brain to maintain complex movement patterns without exhaustion.</span>
+                    </li>
+                    <li className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <strong className="block text-indigo-700 mb-1">Signal Synchronization</strong>
+                        <span className="text-slate-600 text-sm">Multiple myelinated pathways can fire in precise coordination, enabling the simultaneous control of bow speed, pressure, contact point, and sounding point that defines advanced violin technique.</span>
+                    </li>
+                </ul>
+
+                <h3>The Oligodendrocyte: Your Brain's Master Craftsman</h3>
+                <p>
+                  If myelin is the insulation, oligodendrocytes are the skilled workers who install it. Understanding how these cells operate is crucial for effective teaching.
+                </p>
+                <p>
+                  Oligodendrocytes begin as precursor cells called OPCs (oligodendrocyte precursor cells) that are distributed throughout the brain's white matter. When a neural pathway fires repeatedly, the electrical activity triggers a cascade of chemical signals:
+                </p>
+                <ul className="list-disc pl-5 mb-4">
+                    <li><strong>Activity Detection:</strong> Repeated neural firing releases glutamate and other neurotransmitters that OPCs can detect.</li>
+                    <li><strong>Chemical Signaling:</strong> The active neurons release adenosine, which signals OPCs to begin differentiation into mature oligodendrocytes.</li>
+                    <li><strong>Myelin Production:</strong> The mature oligodendrocyte extends multiple processes (up to 50 or more) to nearby axons and begins wrapping them in myelin sheaths.</li>
+                    <li><strong>Progressive Wrapping:</strong> Each oligodendrocyte can myelinate up to 50 different axon segments, gradually increasing the thickness of myelin with continued use of the pathway.</li>
+                </ul>
+                <p>
+                    Here's the crucial insight for teachers: <strong>oligodendrocytes respond to activity, not accuracy</strong>. They cannot distinguish between a perfectly executed shift and a consistently executed wrong note. They simply detect that a pathway is firing frequently and wrap it in myelin accordingly.
+                </p>
+                <div className="bg-amber-50 border-l-4 border-amber-500 p-4 my-6 italic text-amber-900 font-medium">
+                    "Practice makes permanent. Only perfect practice makes perfect."
+                </div>
+
+                <h3>The Three-Phase Process of Motor Learning</h3>
+                <p>Myelination doesn't happen in isolation. It's the final step in a three-phase process that every new motor skill must pass through.</p>
+                
+                <div className="my-8 flex justify-center">
+                    <a href="https://ibb.co/2YHjYPZv" target="_blank" rel="noopener noreferrer">
+                        <img src="https://i.ibb.co/3YQ0YWRp/cognitive.jpg" alt="cognitive phase diagram" className="rounded-xl shadow-md max-w-full md:max-w-lg" />
+                    </a>
+                </div>
+
+                <div className="space-y-4 not-prose mt-4">
+                     <div className="p-4 bg-slate-100 rounded-lg">
+                        <h5 className="font-bold text-slate-800">Phase 1: Cognitive (High Error, High Attention)</h5>
+                        <p className="text-sm text-slate-600 mt-1">The student is learning what to do. Every movement requires conscious attention and verbal instruction. The motor cortex is highly active, as is the prefrontal cortex (responsible for conscious control). Error rates are high because the neural pathways don't yet exist—the student is literally forging new connections with each attempt.</p>
+                     </div>
+                     <div className="p-4 bg-slate-100 rounded-lg">
+                        <h5 className="font-bold text-slate-800">Phase 2: Associative (Decreasing Error, Moderate Attention)</h5>
+                        <p className="text-sm text-slate-600 mt-1">The basic pathway exists but is weak and unreliable. The student knows what to do but must concentrate to do it correctly. This is when the early stages of myelination begin—the pathway has been "carved" through repeated use, and oligodendrocytes are beginning to insulate it.</p>
+                     </div>
+                     <div className="p-4 bg-slate-100 rounded-lg">
+                        <h5 className="font-bold text-slate-800">Phase 3: Autonomous (Low Error, Low Attention)</h5>
+                        <p className="text-sm text-slate-600 mt-1">The pathway is heavily myelinated. The movement is fast, automatic, and reliable. It no longer requires conscious attention and can be executed even under stress or while simultaneously performing other tasks (like listening for intonation while managing bow distribution).</p>
+                     </div>
+                </div>
+              </div>
+            )
+          },
+          {
+            id: 'part-2',
+            title: 'Part II: Neurochemistry',
+            subtitle: 'The Neurochemistry of Effective Learning',
+            readTime: 4,
+            content: (
+              <div className="prose prose-slate max-w-none">
+                <h3>The Three Essential Chemicals for Myelination</h3>
+                <p>
+                    While oligodendrocytes respond to neural activity, the quality and permanence of learning depends on the presence of three key neuromodulators. Understanding these chemicals transforms how we design practice sessions and respond to student frustration.
+                </p>
+                
+                <div className="my-8 flex justify-center">
+                    <a href="https://ibb.co/RpFsJLvQ" target="_blank" rel="noopener noreferrer">
+                        <img src="https://i.ibb.co/tMGv1ymY/dopamine.jpg" alt="dopamine diagram showing synaptic transmission" className="rounded-xl shadow-md max-w-full md:max-w-lg" />
+                    </a>
+                </div>
+
+                <h3>The Ideal Neurochemical State: Flow</h3>
+                <p>When all three chemicals are present in optimal amounts, students enter what psychologist Mihaly Csikszentmihalyi called "flow state":</p>
+                
+                <div className="my-8 flex justify-center">
+                    <a href="https://ibb.co/CCmMjhg" target="_blank" rel="noopener noreferrer">
+                        <img src="https://i.ibb.co/pVbRHJc/epinefphrine.jpg" alt="epinefphrine" className="rounded-xl shadow-md max-w-full md:max-w-lg" />
+                    </a>
+                </div>
+
+                <ul className="list-disc pl-5 space-y-2">
+                    <li><strong>Epinephrine</strong> creates alertness without anxiety</li>
+                    <li><strong>Acetylcholine</strong> enables intense focus on the task</li>
+                    <li><strong>Dopamine</strong> provides ongoing motivation and consolidation</li>
+                </ul>
+                <p>In flow, time seems to pass quickly, effort feels effortless, and learning accelerates dramatically. Your role as a teacher is to engineer the conditions that make flow possible.</p>
+              </div>
+            )
+          },
+          {
+            id: 'part-3',
+            title: 'Part III: Deep Practice',
+            subtitle: 'The Master Protocol for Myelination',
+            readTime: 4,
+            content: (
+              <div className="prose prose-slate max-w-none">
+                <h3>The Deep Practice Cycle</h3>
+                <p>
+                    Not all practice is created equal. Mindless repetition builds myelin, but it often wraps the wrong pathways. Deep practice is a specific protocol designed to maximize correct myelination while minimizing the insulation of errors.
+                </p>
+
+                <div className="my-8 flex justify-center">
+                    <a href="https://ibb.co/4RgGkj3P" target="_blank" rel="noopener noreferrer">
+                        <img src="https://i.ibb.co/9H3LPqSs/deepcycle.jpg" alt="deep practice cycle diagram" className="rounded-xl shadow-md max-w-full md:max-w-lg" />
+                    </a>
+                </div>
+                
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm my-6 not-prose">
+                    <ol className="relative border-l border-indigo-200 ml-3 space-y-6">
+                        <li className="mb-10 ml-6">
+                            <span className="absolute flex items-center justify-center w-6 h-6 bg-indigo-100 rounded-full -left-3 ring-8 ring-white">
+                                <span className="text-indigo-800 font-bold text-xs">1</span>
+                            </span>
+                            <h4 className="flex items-center mb-1 text-lg font-semibold text-slate-900">Target Selection</h4>
+                            <p className="mb-4 text-base font-normal text-slate-500">Choose a small, specific element to improve.</p>
+                        </li>
+                        <li className="mb-10 ml-6">
+                            <span className="absolute flex items-center justify-center w-6 h-6 bg-indigo-100 rounded-full -left-3 ring-8 ring-white">
+                                <span className="text-indigo-800 font-bold text-xs">2</span>
+                            </span>
+                            <h4 className="flex items-center mb-1 text-lg font-semibold text-slate-900">Attempt</h4>
+                            <p className="mb-4 text-base font-normal text-slate-500">Execute the movement with full attention.</p>
+                        </li>
+                         <li className="mb-10 ml-6">
+                            <span className="absolute flex items-center justify-center w-6 h-6 bg-indigo-100 rounded-full -left-3 ring-8 ring-white">
+                                 <span className="text-indigo-800 font-bold text-xs">3</span>
+                            </span>
+                            <h4 className="flex items-center mb-1 text-lg font-semibold text-slate-900">Error Detection</h4>
+                            <p className="mb-4 text-base font-normal text-slate-500">Immediately identify what wasn't quite right.</p>
+                        </li>
+                         <li className="mb-10 ml-6">
+                            <span className="absolute flex items-center justify-center w-6 h-6 bg-indigo-100 rounded-full -left-3 ring-8 ring-white">
+                                 <span className="text-indigo-800 font-bold text-xs">4</span>
+                            </span>
+                            <h4 className="flex items-center mb-1 text-lg font-semibold text-slate-900">Adjustment</h4>
+                            <p className="mb-4 text-base font-normal text-slate-500">Make a specific change to address the error.</p>
+                        </li>
+                        <li className="mb-10 ml-6">
+                            <span className="absolute flex items-center justify-center w-6 h-6 bg-indigo-100 rounded-full -left-3 ring-8 ring-white">
+                                 <span className="text-indigo-800 font-bold text-xs">5</span>
+                            </span>
+                            <h4 className="flex items-center mb-1 text-lg font-semibold text-slate-900">Immediate Retry</h4>
+                            <p className="mb-4 text-base font-normal text-slate-500">Attempt the same element again with the adjustment.</p>
+                        </li>
+                        <li className="ml-6">
+                            <span className="absolute flex items-center justify-center w-6 h-6 bg-indigo-100 rounded-full -left-3 ring-8 ring-white">
+                                 <span className="text-indigo-800 font-bold text-xs">6</span>
+                            </span>
+                            <h4 className="flex items-center mb-1 text-lg font-semibold text-slate-900">Repetition</h4>
+                            <p className="mb-4 text-base font-normal text-slate-500">Continue the cycle until consistency is achieved.</p>
+                        </li>
+                    </ol>
+                </div>
+              </div>
+            )
+          },
+          {
+            id: 'part-4',
+            title: 'Part IV: Slow Practice',
+            subtitle: 'The Architecture of Slow Practice',
+            readTime: 3,
+            content: (
+              <div className="prose prose-slate max-w-none">
+                <h3>Why Slow Practice Is Non-Negotiable for Myelination</h3>
+                <p>
+                    The single most common error in practice is playing too fast—attempting to execute movements at speeds that exceed current myelination levels. The problem with premature speed is that errors happen too quickly to detect and correct (no error-correction cycle = no learning).
+                </p>
+
+                <h3>The Slow Practice Protocol</h3>
+                <div className="not-prose overflow-hidden rounded-lg border border-slate-200 shadow-sm my-6">
+                    <table className="min-w-full divide-y divide-slate-200">
+                        <thead className="bg-slate-50">
+                            <tr>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Phase</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Goal</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tempo (% of Target)</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Requirement</th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-slate-200">
+                            <tr>
+                                <td className="px-6 py-4 text-sm font-medium text-slate-900">1. Establish Pattern</td>
+                                <td className="px-6 py-4 text-sm text-slate-500">Perfect execution of all details</td>
+                                <td className="px-6 py-4 text-sm text-slate-500">50-60%</td>
+                                <td className="px-6 py-4 text-sm text-slate-500">10 perfect reps</td>
+                            </tr>
+                            <tr className="bg-slate-50">
+                                <td className="px-6 py-4 text-sm font-medium text-slate-900">2. Build Reliability</td>
+                                <td className="px-6 py-4 text-sm text-slate-500">Maintain correctness with speed</td>
+                                <td className="px-6 py-4 text-sm text-slate-500">70-80%</td>
+                                <td className="px-6 py-4 text-sm text-slate-500">6-8 perfect reps</td>
+                            </tr>
+                            <tr>
+                                <td className="px-6 py-4 text-sm font-medium text-slate-900">3. Approach Performance</td>
+                                <td className="px-6 py-4 text-sm text-slate-500">Integrate elements</td>
+                                <td className="px-6 py-4 text-sm text-slate-500">90-95%</td>
+                                <td className="px-6 py-4 text-sm text-slate-500">4-6 perfect reps</td>
+                            </tr>
+                            <tr className="bg-slate-50">
+                                <td className="px-6 py-4 text-sm font-medium text-slate-900">4. Performance Tempo</td>
+                                <td className="px-6 py-4 text-sm text-slate-500">Verify automaticity</td>
+                                <td className="px-6 py-4 text-sm text-slate-500">100%</td>
+                                <td className="px-6 py-4 text-sm text-slate-500">2-3 perfect reps</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p className="font-semibold text-indigo-700">
+                    The 80% Rule: Spend 80% of practice time at Phase 1-2 tempos, 15% at Phase 3 tempo, and only 5% at full performance tempo.
+                </p>
+              </div>
+            )
+          },
+          {
+            id: 'part-5',
+            title: 'Part V: Violin-Specific Applications',
+            subtitle: 'Violin-Specific Applications of Myelination Science',
+            readTime: 4,
+            content: (
+              <div className="prose prose-slate max-w-none">
+                <h3>Right Hand Myelination Strategies</h3>
+                <h4>Sounding Point Safari (Contact Point Mapping)</h4>
+                <p>
+                    Beautiful tone requires precise coordination between bow speed, pressure, and contact point (distance from bridge). This coordination must become automatic—conscious calculation is too slow for musical performance. Myelination builds an internal "map" of how these variables interact.
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 not-prose my-6">
+                    <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                        <h5 className="font-bold text-amber-900 mb-2">Sul Ponticello</h5>
+                        <p className="text-sm text-amber-800">Near the bridge, resulting in a bright, metallic tone rich in harmonics.</p>
+                    </div>
+                    <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-200">
+                        <h5 className="font-bold text-emerald-900 mb-2">Normale</h5>
+                        <p className="text-sm text-emerald-800">In the middle, producing a balanced, resonant tone.</p>
+                    </div>
+                     <div className="bg-sky-50 p-4 rounded-lg border border-sky-200">
+                        <h5 className="font-bold text-sky-900 mb-2">Sul Tasto</h5>
+                        <p className="text-sm text-sky-800">Over the fingerboard, creating a soft, flute-like tone.</p>
+                    </div>
+                </div>
+
+                <p>
+                    The practice protocol involves slowly moving between these zones and calibrating bow speed and pressure to achieve the optimal tone at each contact point, building a flexible internal map.
+                </p>
+              </div>
+            )
+          },
+          {
+            id: 'part-7',
+            title: 'Part VII: Rest & Sleep',
+            subtitle: 'When Myelination Actually Happens',
+            readTime: 4,
+            content: (
+              <div className="prose prose-slate max-w-none">
+                <h3>The Paradox of Rest-Based Learning</h3>
+                <p>
+                    Here's the counterintuitive reality: myelination doesn't happen during practice. It happens during rest and sleep. During practice, you're signaling to oligodendrocytes that certain pathways are important. But the actual process of wrapping those axons in myelin occurs when the brain has metabolic resources to devote to construction rather than performance.
+                </p>
+
+                <div className="my-8 flex justify-center">
+                    <a href="https://ibb.co/gZHvgPfJ" target="_blank" rel="noopener noreferrer">
+                        <img src="https://i.ibb.co/0y8BJF6r/practiceand-rest.jpg" alt="practice and rest consolidation graph" className="rounded-xl shadow-md max-w-full md:max-w-lg" />
+                    </a>
+                </div>
+
+                <p>
+                    This process is known as offline consolidation. During sleep, particularly during stage 2 non-REM sleep, the brain generates "sleep spindles." These spindles are a sign that the brain is replaying the motor sequences practiced during the day, strengthening the correct pathways and selectively weakening the incorrect ones.
+                </p>
+
+                <h3>The 90-Minute Practice Cycle</h3>
+                <p>The brain's ultradian rhythms create natural 90-minute cycles of optimal focus and learning capacity.</p>
+                <ul className="not-prose space-y-2 mt-4 mb-8">
+                    <li className="flex items-center gap-3">
+                        <Clock className="w-5 h-5 text-indigo-500" />
+                        <span><strong>Minutes 0-20:</strong> Warm-up period, focus is building.</span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                        <Activity className="w-5 h-5 text-green-500" />
+                        <span><strong>Minutes 20-70:</strong> Peak focus and learning capacity.</span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                        <AlertTriangle className="w-5 h-5 text-orange-500" />
+                        <span><strong>Minutes 70-90:</strong> Focus and performance begin to decline.</span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                        <Shield className="w-5 h-5 text-red-500" />
+                        <span><strong>Minutes 90-120:</strong> Continued practice becomes progressively less effective.</span>
+                    </li>
+                </ul>
+
+                <h3>Micro-Breaks and Neural Replay</h3>
+                <p>
+                    Even within practice sessions, brief breaks dramatically enhance learning. Research shows that during brief 10-15 second pauses after a few repetitions, the brain rapidly replays the motor sequence at high speed. This offline replay is when myelination signals are consolidated.
+                </p>
+              </div>
+            )
+          }
+        ];
+
+        // --- App Component ---
+
+        const App = () => {
+          const [activeSectionId, setActiveSectionId] = useState(SECTIONS[0].id);
+          const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+          const [readSections, setReadSections] = useState(new Set());
+          const contentRef = useRef(null);
+
+          // Scroll to top of content when section changes
+          useEffect(() => {
+            if (contentRef.current) {
+              contentRef.current.scrollTop = 0;
+            }
+          }, [activeSectionId]);
+
+          const activeSection = SECTIONS.find(s => s.id === activeSectionId) || SECTIONS[0];
+          const activeIndex = SECTIONS.findIndex(s => s.id === activeSectionId);
+          const nextSection = SECTIONS[activeIndex + 1];
+
+          const handleSectionChange = (id) => {
+            setActiveSectionId(id);
+            setIsMobileMenuOpen(false);
+          };
+
+          const markAsRead = (id) => {
+            setReadSections(prev => {
+              const newSet = new Set(prev);
+              newSet.add(id);
+              return newSet;
+            });
+          };
+
+          const progress = Math.round((readSections.size / SECTIONS.length) * 100);
+
+          return (
+            <div className="flex h-screen bg-slate-50 overflow-hidden">
+              
+              {/* Mobile Header */}
+              <div className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-50 flex items-center justify-between px-4 md:hidden">
+                <span className="font-serif font-bold text-lg text-slate-900">NeuroViolin</span>
+                <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-slate-600">
+                  {isMobileMenuOpen ? <X /> : <Menu />}
+                </button>
+              </div>
+
+              {/* Sidebar Navigation */}
+              <aside className={`
+                fixed md:relative top-16 md:top-0 left-0 h-[calc(100vh-64px)] md:h-screen w-72 bg-white border-r border-slate-200 z-40 transition-transform duration-300 ease-in-out
+                ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+              `}>
+                <div className="p-6 h-full flex flex-col">
+                  <div className="mb-8 hidden md:block">
+                    <h1 className="font-serif font-bold text-xl text-slate-900 flex items-center gap-2">
+                      <BookOpen className="w-6 h-6 text-indigo-600" />
+                      NeuroViolin
+                    </h1>
+                    <p className="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">Mastery Guide</p>
+                  </div>
+
+                  <div className="mb-6">
+                    <div className="flex justify-between text-xs font-semibold text-slate-500 mb-2">
+                      <span>PROGRESS</span>
+                      <span>{progress}%</span>
+                    </div>
+                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-indigo-500 transition-all duration-500 ease-out"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <nav className="flex-1 overflow-y-auto space-y-1 pr-2 custom-scrollbar">
+                    {SECTIONS.map((section, idx) => {
+                      const isActive = section.id === activeSectionId;
+                      const isRead = readSections.has(section.id);
+                      
+                      return (
+                        <button
+                          key={section.id}
+                          onClick={() => handleSectionChange(section.id)}
+                          className={`
+                            w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors flex items-center justify-between group
+                            ${isActive ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-slate-600 hover:bg-slate-50'}
+                          `}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className={`
+                              flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold border
+                              ${isActive ? 'border-indigo-200 bg-white text-indigo-600' : 'border-slate-200 text-slate-400 bg-slate-50'}
+                              ${isRead && !isActive ? 'bg-emerald-100 border-emerald-200 text-emerald-600' : ''}
+                            `}>
+                              {isRead ? <CheckCircle className="w-3.5 h-3.5" /> : idx + 1}
+                            </span>
+                            <span className="truncate w-40">{section.title}</span>
+                          </div>
+                          {isActive && <ChevronRight className="w-4 h-4 text-indigo-400" />}
+                        </button>
+                      );
+                    })}
+                  </nav>
+                </div>
+              </aside>
+
+              {/* Main Content Area */}
+              <main className="flex-1 h-screen overflow-hidden relative pt-16 md:pt-0">
+                <div ref={contentRef} className="h-full overflow-y-auto scroll-smooth">
+                  <div className="max-w-3xl mx-auto px-6 py-12 md:py-20">
+                    
+                    <header className="mb-8 border-b border-slate-100 pb-8">
+                      <div className="text-xs font-bold tracking-widest text-indigo-500 uppercase mb-3">
+                        Part {activeIndex + 1} of {SECTIONS.length} • {activeSection.readTime} min read
+                      </div>
+                      <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-4 leading-tight">
+                        {activeSection.title}
+                      </h2>
+                      {activeSection.subtitle && (
+                        <p className="text-xl text-slate-500 font-light">{activeSection.subtitle}</p>
+                      )}
+                    </header>
+
+                    <div className="min-h-[400px]">
+                      {activeSection.content}
+                    </div>
+
+                    <footer className="mt-16 pt-8 border-t border-slate-100 flex flex-col items-center gap-6">
+                      {!readSections.has(activeSection.id) ? (
+                         <button
+                          onClick={() => markAsRead(activeSection.id)}
+                          className="px-8 py-3 bg-slate-900 text-white rounded-full font-medium shadow-lg shadow-slate-200 hover:bg-slate-800 transition-all active:scale-95 flex items-center gap-2"
+                        >
+                          <CheckCircle className="w-5 h-5" />
+                          Mark Section as Complete
+                        </button>
+                      ) : (
+                        <div className="text-emerald-600 font-medium flex items-center gap-2">
+                          <CheckCircle className="w-5 h-5" />
+                          Section Completed
+                        </div>
+                      )}
+
+                      {nextSection && (
+                        <button 
+                          onClick={() => handleSectionChange(nextSection.id)}
+                          className="text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-2 text-sm font-medium"
+                        >
+                          Next: {nextSection.title}
+                          <ArrowRight className="w-4 h-4" />
+                        </button>
+                      )}
+                    </footer>
+
+                    <div className="h-20" /> {/* Spacer */}
+                  </div>
+                </div>
+              </main>
+            </div>
+          );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
 </html>
