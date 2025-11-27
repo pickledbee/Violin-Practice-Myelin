@@ -26,18 +26,18 @@
     <div id="root"></div>
 
     <script type="text/babel" data-type="module">
+        // CRITICAL FIX: Ensure all libraries share the exact same React instance using ?deps
         import React, { useState, useEffect, useRef } from 'https://esm.sh/react@18.2.0';
-        import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
+        import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client?deps=react@18.2.0';
         import { 
             Menu, X, CheckCircle, Circle, ArrowRight, BookOpen, ChevronRight, 
             Clock, Activity, Shield, AlertTriangle 
-        } from 'https://esm.sh/lucide-react@0.263.1';
+        } from 'https://esm.sh/lucide-react@0.263.1?deps=react@18.2.0';
         
-        // CRITICAL FIX: Use ?bundle to ensure Recharts works in browser without build step
         import {
             LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
             ReferenceArea, BarChart, Bar, Cell, LabelList
-        } from 'https://esm.sh/recharts@2.12.3?bundle';
+        } from 'https://esm.sh/recharts@2.12.3?deps=react@18.2.0,react-dom@18.2.0';
 
         // --- Visualizations ---
         
